@@ -1,6 +1,6 @@
 # BackEnd_Engineering_1
 
-a Web Service API for a discussion forum application.
+A Web Service API for a discussion forum application.
  
 The application should exposes the following RESTful URL endpoints. All data sent to and from the API should be in JSON format with the Content-Type header field set to application/json.
 
