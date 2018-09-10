@@ -20,7 +20,7 @@ app.config["DEBUG"] = True
 #subclass of BasicAuth, with check_credentials function overwritten
 class Auth(BasicAuth):
     def check_credentials(self,username,password):
-        if username == 'blanca' and password == 'password':
+        if username == 'david' and password == 'password':
             return render_template('forum.html')
         else:
             return False
