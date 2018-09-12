@@ -22,6 +22,7 @@ CREATE TABLE THREADS
  DATECREATED DATE, 
  TIMESTAMPS TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
  CREATORID INT,
+ FORUMID INT NOT NULL,
  PRIMARY KEY (THREADSID),
  FOREIGN KEY (FORUMID) REFERENCES FORUMS(FORUMID),
  FOREIGN KEY (CREATORID) REFERENCES USERS(USERID) 
@@ -33,5 +34,44 @@ CREATE TABLE USERS
  FIRSTNAME VARCHAR(60), 
  LASTNAME VARCHAR(60),
  PRIMARY KEY (USERID)
-);'
+);
 
+
+/* A query to get all forums, who created them , and the name of the forums */
+SELECT 
+	FORUMID, 
+	FORUMTITLE, 
+	FIRSTNAME, 
+	LASTNAME
+FROM 
+	FORUMS F, USERS  U
+WHERE 
+	F.CREATORID = U.USERID; 
+/* A query to insert a forum, who created them , the time it was created, and the name of the forums */
+insert into forums 
+( 
+	FORUMTITLE, 
+	FIRSTNAME, 
+	LASTNAME, 
+	CREATORID
+)
+ VALUES 
+ (
+  ?,
+  ?,
+  ?,
+  ?
+ );
+ /* A query to get all forums, who created them , and the name of the forums */
+SELECT 
+	T.THREADID, 
+	T.THREADTITLE, 
+	T.FIRSTNAME, 
+	T.LASTNAME, 
+	T.TIMESTAMPS
+FROM 
+	FORUMS F, THREADS  T
+WHERE 
+	F.FORUMID = T.FORUMID; 
+
+ 
