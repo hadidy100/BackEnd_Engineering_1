@@ -17,14 +17,28 @@ app.config["DEBUG"] = True
 #create all of my classes here*******************************************************
 
 #authentication class
-#subclass of BasicAuth, with check_credentials function overriden
+#subclass of BasicAuth, with check_credentials function overwritten
 class Auth(BasicAuth):
     def check_credentials(self,username,password):
         if username == 'david' and password == 'password':
-            return True
+            return render_template('forum.html')
         else:
             return False
 #end of my classes******************************************************************
+
+
+#backend functions*************************************
+def newForum(name,creator):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO forums(name,creator) VALUES('"+name+"','"+creator+"')")
+    conn.commit()
+    return 'entered into database'
+
+#******************************************************
+
+
+
 
 #instantiate Auth class
 basic_auth = Auth(app)
@@ -76,10 +90,14 @@ def showForums():
 #********************************************************
 @app.route('/forums',methods=['POST'])
 @basic_auth.required
-@basic_auth.challenge
 def createForum():
-    signedIn = basic_auth.check_credentials('david','pass')
-    return str(signedIn)
+    auth = request.authorization
+    #check
+    name = request.form.get('name')
+    if name:
+        return newForum(name,auth.username)
+    signedIn = basic_auth.check_credentials(auth.username,auth.password)
+    return signedIn
 
 #********************************************************
 #*********************end problem 2**********************
