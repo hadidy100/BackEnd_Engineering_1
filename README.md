@@ -4,6 +4,13 @@ A Web Service API for a discussion forum application.
  
 The application should exposes the following RESTful URL endpoints. All data sent to and from the API should be in JSON format with the Content-Type header field set to application/json.
 
+<h1>Dependencies, install the following through command line:</h1>
+<p>pip install flask</p>
+<p>pip install Flask-BasicAuth</p>
+<p>pip install click</p>
+<p>sudo apt-get install sqlitebrowser</p>
+<p>sudo apt-get install sqlite3</p>
+
 
 <h1>Instructions:</h1>
 <h3>initialize drop,create database tables and using test data with sql script:</h3>
