@@ -5,6 +5,17 @@ A Web Service API for a discussion forum application.
 The application should exposes the following RESTful URL endpoints. All data sent to and from the API should be in JSON format with the Content-Type header field set to application/json.
 
 
+<h1>Instructions:</h1>
+initialize drop,create database tables and using test data with sql script:
+<p><font color="green">flask init_db</font></p>
+
+test GET,POST,PUT,etc... using the following curl commands:
+<p><font color="green">curl -i http://localhost:5000/forums</font></p>
+<p><font color="green">curl -u david:password -i -d '{"name":"cassandra"}' -H "Content-Type: application/json" -X POST "http://localhost:5000/forums"</font></p>
+<br><br>
+
+
+
 Method
 GET
 URL
