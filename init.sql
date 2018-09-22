@@ -36,11 +36,11 @@ CREATE UNIQUE INDEX idx_thread ON threads (title);
 INSERT INTO users(username,password) VALUES('david','password');
 INSERT INTO users(username,password) VALUES('anas','password');
 INSERT INTO users(username,password) VALUES('jon','password');
-
+commit;
 --isert 3 sample forums where each one is created by one of the sample users above
-INSERT INTO forums(name,creator) VALUES('redis',(select id from users where username = 'david'));
-INSERT INTO forums(name,creator) VALUES('mongodb',(select id from users where username ='jon'));
-INSERT INTO forums(name,creator) VALUES('Oracle DB',(select id from users where username ='anas'));
+INSERT INTO forums(name,creator) VALUES('redis',(select id from users where username = 'david'),DATETIME('now','localtime'));
+INSERT INTO forums(name,creator) VALUES('mongodb',(select id from users where username ='jon'),DATETIME('now','localtime'));
+INSERT INTO forums(name,creator) VALUES('Oracle DB',(select id from users where username ='anas'),DATETIME('now','localtime'));
 
 
 --insert 3 sample threads for each one of the sample forums that are created above
@@ -115,3 +115,4 @@ INSERT INTO threads
               (select id from forums where name = 'Oracle DB'),
               DATETIME('now','localtime')
             );
+            commit;
