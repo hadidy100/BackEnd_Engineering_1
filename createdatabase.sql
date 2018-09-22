@@ -1,77 +1,118 @@
- 
- DROP DATABASE IF EXISTS FORUMSAPI; 
- CREATE DATABASE IF NOT EXISTS FORUMSAPI; 
- USE FORUMSAPI;
- 
-/* TABLE FOR THE FORUMS, WHICH HAS A FOREIGN KEY TO REFERENCES THE USERS TABLE SO THAT WE CAN JOIN IT AND GET THE USERS INFORMATION    */
-CREATE TABLE FORUMS 
-(
- FORUMTITLE VARCHAR(60), 
- FORUMID INT AUTO_INCREMENT,
- CREATORID INT,  
- TIMESTAMPS TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
- PRIMARY KEY (FORUMSID),
- FOREIGN KEY (CREATORID) REFERENCES USERS(USERID)  
+DROP TABLE IF EXISTS forums;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS threads;
+-- users table which will be referenced by forums and threads tables
+CREATE TABLE users(
+    id INTEGER PRIMARY KEY,
+    username TEXT,
+    password TEXT
 );
-/*FOR THE THREADS THAT ARE CREATED INSIDE THE FORUMS, AND HAS 2 FOREIGN KEYS, TO JOIN IT TO BOTH THE FORUM TABLE, SO THAT WE 
-  CAN SEE WHICH FORUM DOES THIS THREAD BELONG TO, AND A REFERENCE TO THE USERS TABLE, IN ORDER TO KNOW WHO CREATED THE THREAD, SINCE ANY AUTHENTICATED USER OTHER THAN THE CREATOR OF THE FORUM CAN ACTUALLY CREATE A THREAD */ 
-CREATE TABLE THREADS 
-(
- THREADID INT AUTO_INCREMENT, 
- THREADTITLE VARCHAR(60),
- DATECREATED DATE, 
- TIMESTAMPS TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
- CREATORID INT,
- FORUMID INT NOT NULL,
- PRIMARY KEY (THREADSID),
- FOREIGN KEY (FORUMID) REFERENCES FORUMS(FORUMID),
- FOREIGN KEY (CREATORID) REFERENCES USERS(USERID) 
+-- forums table which has the forum title, and has a foreign key to refernce the user id from the users table so that we can query the name if we needed it
+--  You might ask, why can not we just add the name of the user in this table, and the answer is normalization methods, to preserve consistancy and avoid duplication and anomalies
+CREATE TABLE forums(
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    creator INTEGER NOT NULL,
+    timestamp TEXT,
+    FOREIGN KEY (creator) REFERENCES USERS(id)
 );
-/* THE MAIN TABLE THAT HAS THE USERS INFORMATION, WHICH ALL THE OTHER TABLES CAN REFERENCE IT AND JOIN TO IT    */
-CREATE TABLE USERS 
-(
- USERID INT AUTO_INCREMENT, 
- FIRSTNAME VARCHAR(60), 
- LASTNAME VARCHAR(60),
- PRIMARY KEY (USERID)
+--threads table also references users and forums by their id so normalization reasons as well
+CREATE TABLE threads(
+    id INTEGER PRIMARY KEY,
+    title TEXT,
+    comment TEXT,
+    creator INTEGER,
+    forumId INTEGER,
+    timestamp TEXT,
+    foreign key (creator) REFERENCES users (id),
+    foreign key (forumId) REFERENCES forums (id)
 );
 
+CREATE UNIQUE INDEX idx_name ON forums (name);
+CREATE UNIQUE INDEX idx_user ON users (username);
+CREATE UNIQUE INDEX idx_thread ON threads (title);
 
-/* A query to get all forums, who created them , and the name of the forums */
-SELECT 
-	FORUMID, 
-	FORUMTITLE, 
-	FIRSTNAME, 
-	LASTNAME
-FROM 
-	FORUMS F, USERS  U
-WHERE 
-	F.CREATORID = U.USERID; 
-/* A query to insert a forum, who created them , the time it was created, and the name of the forums */
-insert into forums 
-( 
-	FORUMTITLE, 
-	FIRSTNAME, 
-	LASTNAME, 
-	CREATORID
+-- isnert 3 sample users
+INSERT INTO users(username,password) VALUES('david','password');
+INSERT INTO users(username,password) VALUES('anas','password');
+INSERT INTO users(username,password) VALUES('jon','password');
+commit;
+--isert 3 sample forums where each one is created by one of the sample users above
+INSERT INTO forums(name,creator,timestamp) VALUES('redis',(select id from users where username = 'david'),DATETIME('now','localtime'));
+INSERT INTO forums(name,creator,timestamp) VALUES('mongodb',(select id from users where username ='jon'),DATETIME('now','localtime'));
+INSERT INTO forums(name,creator,timestamp) VALUES('Oracle DB',(select id from users where username ='anas'),DATETIME('now','localtime'));
+
+
+--insert 3 sample threads for each one of the sample forums that are created above
+--Each thread has the forum id so that we can see what forum does this thread belog to,
+-- in addition to having a creator id so that we know who created that thread
+
+INSERT INTO threads
+(
+  title,
+  comment,
+  creator,
+  forumid,
+  timestamp
 )
- VALUES 
- (
-  ?,
-  ?,
-  ?,
-  ?
- );
- /* A query to get all forums, who created them , and the name of the forums */
-SELECT 
-	T.THREADID, 
-	T.THREADTITLE, 
-	T.FIRSTNAME, 
-	T.LASTNAME, 
-	T.TIMESTAMPS
-FROM 
-	FORUMS F, THREADS  T
-WHERE 
-	F.FORUMID = T.FORUMID; 
-
- 
+  VALUES
+  (
+    'HELP',
+    'Why do I get an error when I ping to redis-cli??, please help!!',
+    (select id from users where username = 'david'),
+    (select id from forums where name = 'redis'),
+    DATETIME('now','localtime')
+  );
+--Thead #2
+  INSERT INTO threads
+  (
+    title,
+    comment,
+    creator,
+    forumid,
+    timestamp
+  )
+    VALUES
+    (
+      'mongodb vs hadoop',
+      'Can anyone please tell what is the difference between mangoDB and Hadoop? ',
+      (select id from users where username = 'jon'),
+      (select id from forums where name = 'mongodb'),
+      DATETIME('now','localtime')
+    );
+--Thead #3
+    INSERT INTO threads
+    (
+      title,
+      comment,
+      creator,
+      forumid,
+      timestamp
+    )
+      VALUES
+      (
+        'Price',
+        'Why would any enterprise chooses to use Oracle instead of mySql is byond me,
+        I mean it is a lot more expesive, and I do not see any performance or capability issues, thoughts? Anyone? ',
+        (select id from users where username = 'anas'),
+        (select id from forums where name = 'Oracle DB'),
+        DATETIME('now','localtime')
+      );
+      --Thead #4
+          INSERT INTO threads
+          (
+            title,
+            comment,
+            creator,
+            forumid,
+            timestamp
+          )
+            VALUES
+            (
+              'SQL Lite',
+              'How handy is this SQL lite thing, I must admit, I have never used it before, but I love it!!! ',
+              (select id from users where username = 'anas'),
+              (select id from forums where name = 'Oracle DB'),
+              DATETIME('now','localtime')
+            );
+            commit;
