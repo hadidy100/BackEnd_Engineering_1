@@ -43,6 +43,7 @@ getUserid = 'select u.id username from users u where u.username = ?'
 getAllForums = 'SELECT f.id id, f.name name, u.username username FROM forums f, users u where u.id = f.creator;'
 getAspecificFourm = 'SELECT u.username username, f.name name, f.timestamp timestamp FROM forums f, users u where u.id = f.creator and f.id = ? order by f.timestamp;'
 getAllThreadsWithinAforum = 'SELECT t.id id,t.title title ,u.username username,f.name,t.timestamp timestamp FROM forums f,users u,threads t where u.id = t.creator  and t.forumid = f.id and f.id = ? order by t.timestamp;'
+getAspecificThread = 'select u.username username, tp.comment, tp.timestamp from users u,forums f, threadPosts tp, threads t where u.id = tp.creator and f.id = t.forumId and t.id = ? and tp.id = ? and f.id = ?'
 #***********************************************************************************
 #instantiate Auth class
 basic_auth = Auth(app)
@@ -74,6 +75,7 @@ def showOrForums():
                 newForum([forumName], (userId))
                 return jsonify (data)
 #***********************************************************************************
+#Problems 3 and 4 for GET and POST on a specific forum_id
 @app.route('/forums/<int:forum_Id>',methods=['GET','POST'])
 def showThreadsWithinForum (forum_Id):
         conn = sqlite3.connect('forums.db')
@@ -102,5 +104,37 @@ def showThreadsWithinForum (forum_Id):
                 forumName = data['name']
                 newThread(forumName, 1)
                 return jsonify (data)
+#***********************************************************************************
+#Problems 5 and 6 for GET and POST on a specific forum_id and a specific thread_Id
+@app.route('/forums/<int:forum_Id>/<thread_Id>',methods=['GET','POST'])
+def showThreadsWithinForum (forum_Id):
+        conn = sqlite3.connect('forums.db')
+        cur = conn.cursor()
+        #use the query string that we created in the begining
+        if request.method == 'GET':
+            intForumId = int(forum_Id)
+            intThreadId = int(thread_Id)
+            print (forum_Id)
+            print (intForumId)
+            results = cur.execute([getAspecificThread],(intForumId,intThreadId)).fetchall()
+            #convert the result into JSON
+            return jsonify(results)
+        if request.method == 'POST':
+                    #get username and password from Authorization header
+            user = request.authorization.username
+            print(user)
+            #userId = cur.execute(getUserid, user).fetchall()
+            password = request.authorization.password
+                    #authenticate user
+            auth = Auth()
+            validUser = len(auth.check_credentials(user,password))
+            if  validUser <= 2:
+                return 'invalid login'
+            elif validUser > 2:
+                data = request.get_json()
+                forumName = data['name']
+                newThread(forumName, 1)
+                return jsonify (data)
+
 if __name__ == '__main__':
     app.run()
