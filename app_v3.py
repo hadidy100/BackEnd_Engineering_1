@@ -57,6 +57,8 @@ def showOrForums():
         if request.method == 'GET':
             results = cur.execute(getAllForums).fetchall()
             #convert the result into JSON
+            print(results)
+            print('Anas') 
             return jsonify(results)
         if request.method == 'POST':
                     #get username and password from Authorization header
@@ -71,6 +73,7 @@ def showOrForums():
                 return 'invalid login'
             elif validUser > 2:
                 data = request.get_json()
+                print(data)
                 forumName = data['name']
                 newForum([forumName], (userId))
                 return jsonify (data)
@@ -78,7 +81,7 @@ def showOrForums():
 #Problems 3 and 4 for GET and POST on a specific forum_id
 @app.route('/forums/<int:forum_Id>',methods=['GET','POST'])
 def showThreadsWithinForum (forum_Id):
-        conn = sqlite3.connect('forums.db')
+        #conn = sqlite3.connect('forums.db')
         cur = conn.cursor()
         #use the query string that we created in the begining
         if request.method == 'GET':
@@ -104,37 +107,7 @@ def showThreadsWithinForum (forum_Id):
                 forumName = data['name']
                 newThread(forumName, 1)
                 return jsonify (data)
-#***********************************************************************************
-#Problems 5 and 6 for GET and POST on a specific forum_id and a specific thread_Id
-@app.route('/forums/<int:forum_Id>/<thread_Id>',methods=['GET','POST'])
-def showThreadsWithinForum (forum_Id):
-        conn = sqlite3.connect('forums.db')
-        cur = conn.cursor()
-        #use the query string that we created in the begining
-        if request.method == 'GET':
-            intForumId = int(forum_Id)
-            intThreadId = int(thread_Id)
-            print (forum_Id)
-            print (intForumId)
-            results = cur.execute([getAspecificThread],(intForumId,intThreadId)).fetchall()
-            #convert the result into JSON
-            return jsonify(results)
-        if request.method == 'POST':
-                    #get username and password from Authorization header
-            user = request.authorization.username
-            print(user)
-            #userId = cur.execute(getUserid, user).fetchall()
-            password = request.authorization.password
-                    #authenticate user
-            auth = Auth()
-            validUser = len(auth.check_credentials(user,password))
-            if  validUser <= 2:
-                return 'invalid login'
-            elif validUser > 2:
-                data = request.get_json()
-                forumName = data['name']
-                newThread(forumName, 1)
-                return jsonify (data)
+
 
 if __name__ == '__main__':
     app.run()
