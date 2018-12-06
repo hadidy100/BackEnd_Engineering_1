@@ -1,10 +1,5 @@
 #Anas Elhadidy 
-#Jon Sumarto
-#David Toledo Viveros
-#Utilizing scylla DB and the cassandra framework, this API utilizes the previously forum application that #we built but using nosql database, for best result for horizontal scalability 
-#The code creates the keyspace, index, and the tables in one script and then listens on port 5000 for #flask requests
-
-
+ 
 import flask, click, sqlite3, sys ,datetime, uuid
 from flask import g, request, jsonify, json, render_template
 from flask_basicauth import BasicAuth
@@ -335,7 +330,7 @@ def pushUser(userName):
 
  #***********************************************************************************    
 def updateUser(userName, password):
-   cluster = Cluster(['172.17.0.2'])
+    cluster = Cluster(['172.17.0.2'])
     session = cluster.connect()
     theKeyspace = 'forumsDB'
     session.execute('update users set password = ? where username = ?',(userName, password))
@@ -362,7 +357,7 @@ def forumExists(forum_id):
       return 'NO'
  #*********************************************************************************** 
 def userExists(userName):
-   cluster = Cluster(['172.17.0.2'])
+    cluster = Cluster(['172.17.0.2'])
     session = cluster.connect()
     session.execute(""" USE forumsdb """)
     data = session.execute(checkUser, [userName])
