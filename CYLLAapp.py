@@ -1,4 +1,8 @@
 #Anas Elhadidy 
+#Jon Sumarto
+#David Toledo Viveros
+#Utilizing scylla DB and the cassandra framework, this API utilizes the previously forum application that #we built but using nosql database, for best result for horizontal scalability 
+#The code creates the keyspace, index, and the tables in one script and then listens on port 5000 for #flask requests
  
 import flask, click, sqlite3, sys ,datetime, uuid
 from flask import g, request, jsonify, json, render_template
